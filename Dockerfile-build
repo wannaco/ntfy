@@ -56,4 +56,4 @@ LABEL org.opencontainers.image.description="Send push notifications to your phon
 COPY --from=builder /app/dist/ntfy_linux_server/ntfy /usr/bin/ntfy
 
 EXPOSE 80/tcp
-ENTRYPOINT ["ntfy", "serve"]
+ENTRYPOINT ["ntfy", "serve", "--log-level", "debug"]
