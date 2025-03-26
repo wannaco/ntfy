@@ -1,2 +1,37 @@
-FROM binwiederhier/ntfy
-ENTRYPOINT ["ntfy", "serve"]
+# Use a base image with a recent Debian version (e.g., Debian Bullseye or later)
+FROM debian:latest
+
+# Set the working directory (optional, but good practice)
+WORKDIR /app
+
+# Update package lists and install necessary tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    gpg \
+    apt-transport-https \
+    systemd \
+    && rm -rf /var/lib/apt/lists/*  # Clean up apt cache to reduce image size
+
+# Install ntfy
+RUN mkdir -p /etc/apt/keyrings
+RUN curl -fsSL https://archive.heckel.io/apt/pubkey.txt | gpg --dearmor -o /etc/apt/keyrings/archive.heckel.io.gpg
+RUN sh -c "echo 'deb [arch=amd64 signed-by=/etc/apt/keyrings/archive.heckel.io.gpg] https://archive.heckel.io/apt debian main' > /etc/apt/sources.list.d/archive.heckel.io.list"
+RUN apt update
+RUN apt install -y ntfy
+
+# Configure ntfy (if needed).  This is where you'd put any custom
+# configuration files or settings for ntfy.  For example, you might
+# copy a config file:
+# COPY ntfy.conf /etc/ntfy/ntfy.conf
+
+# Enable and start ntfy (Important: Cloud Run needs a process to run)
+# Cloud Run will automatically start the process defined by CMD
+# so we will start ntfy here.
+RUN systemctl enable ntfy.service
+CMD ["/usr/bin/ntfy"]
+
+# Optional: Expose the port ntfy uses (usually 80/tcp or 443/tcp)
+# Cloud Run automatically handles port exposure based on what the
+# application listens on.  This is more of a documentation
+# comment.
+# EXPOSE 80
