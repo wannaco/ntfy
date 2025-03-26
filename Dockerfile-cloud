@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gpg \
     apt-transport-https \
     systemd \
-    ca-certificates  # Add ca-certificates to install the root certificates
+    ca-certificates  \
     && rm -rf /var/lib/apt/lists/*  # Clean up apt cache to reduce image size
 
 # Install ntfy
